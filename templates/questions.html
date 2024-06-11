@@ -1,19 +1,21 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Cheese Fead login/ Sign up</title>
     <link rel = "stylesheet" href = "static\stylesheet.css">
-
+    <title>Random Cheese Image</title>
     <div class="topnav">
         <a class="active" href="/home">Home</a>
         <a href="/login">login</a>
         <a href="/questions/1">questions</a>
-    </div>
+        </div>
 
 </head>
 <body>
-    <div class="header">
-        <h1>login/ Sign up</h1>
-        <p>your cheese questions will all be anserwd</p>
-        </div>
+{% for qu in q%}
+<h1>{{qu}}</h1>  
+{% endfor %}
+{% for an in a%}
+<p>{{an}}</p> 
+{% endfor %}
 </body>
 </html>
