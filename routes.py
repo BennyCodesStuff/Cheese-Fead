@@ -14,13 +14,8 @@ def questions(id):
   cursor = conn.cursor()
   cursor.execute("SELECT theQuestion FROM questions WHERE id = ?",(id,))# ? = id
   questions = cursor.fetchone()
-  answers = []
-  for i in range(3):
-    cursor.execute("SELECT a1,a2,a3 FROM questions WHERE id = ?",(id,))# selctets the awnsers
-    answer = cursor.fetchone()
-    answers.append(answer[0])
   conn.close()
-  return render_template("questions.html", id=2, q=questions, a=answers)
+  return render_template("questions.html", id=2, q=questions)
 
 
 @app.route('/login')
