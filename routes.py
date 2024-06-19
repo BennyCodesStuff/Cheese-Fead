@@ -1,11 +1,11 @@
 from flask import Flask, render_template
 import sqlite3
-
+import random
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-  quest = 1
+  quest =+ 1
   return render_template('cheeseFead.html', id=quest)
 
 @app.route("/questions/<int:id>")
@@ -15,7 +15,7 @@ def questions(id):
   cursor.execute("SELECT theQuestion FROM questions WHERE id = ?",(id,))# ? = id
   questions = cursor.fetchone()
   conn.close()
-  return render_template("questions.html", id=2, q=questions)
+  return render_template("questions.html", q=questions)
 
 
 @app.route('/login')
