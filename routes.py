@@ -5,17 +5,22 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-  quest =+ 1
+  quest += 1
   return render_template('cheeseFead.html', id=quest)
 
 @app.route("/questions/<int:id>")
 def questions(id):
-  conn = sqlite3.connect("CheeseFeed.db")
-  cursor = conn.cursor()
-  cursor.execute("SELECT theQuestion FROM questions WHERE id = ?",(id,))# ? = id
-  questions = cursor.fetchone()
-  conn.close()
-  return render_template("questions.html", q=questions)
+  if id <= 9:
+    conn = sqlite3.connect("CheeseFeed.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT theQuestion FROM questions WHERE id = ?",(id,))# ? = id
+    questions = cursor.fetchone()
+    conn.close()
+    id += 1
+  else:
+    questions = []
+    questions.append("you win")
+  return render_template("questions.html", q=questions, idd=id)
 
 
 @app.route('/login')
