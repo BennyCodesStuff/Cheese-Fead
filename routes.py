@@ -5,8 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-  quest += 1
-  return render_template('cheeseFead.html', id=quest)
+  return render_template('cheeseFead.html')
 
 @app.route("/questions/<int:id>")
 def questions(id):
@@ -19,7 +18,7 @@ def questions(id):
     id += 1
   else:
     questions = []
-    questions.append("you win")
+    questions.append("your cheese")
   return render_template("questions.html", q=questions, idd=id)
 
 

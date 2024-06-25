@@ -18,11 +18,30 @@
   color: white;
 }
 
-.grid-container {
+#grainer {
+  text-align: center;
+  overflow: hidden;
   size: 80%;
   display: grid;
   grid-template-columns: auto auto ;
   gap: 6%;
   background-color: #7f675B;
   padding: 6%;
+}
+
+.grids{
+  overflow: hidden;
+}
+
+.grids a {
+  float: left;
+  color: #f4e87c;
+  text-align: center;
+  font-size: 200%;
+  padding: 2%;
+  border-color: black;
+  border-style: solid;
+  border-width: 2%;
+  margin: 2%;
+  background-color: #7f675B;
 }
