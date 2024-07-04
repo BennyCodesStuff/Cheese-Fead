@@ -1,10 +1,11 @@
 {% extends 'layout.html' %}
 {% block content %}
+</script>
 <h1>{{q[0]}}</h1> 
   <div class="grids">
-    <a  href="{{idd}}">yes</a>
-    <a  href="{{idd}}">no</a>
-    <a  href="{{idd}}">maybe</a>
+    <a  href="/questions/{{idd}}/{{n+1}}/{{y+2}}/{{m+1}}">yes</a>
+    <a  href="/questions/{{idd}}/{{n+2}}/{{y+1}}/{{m+1}}">no</a>
+    <a  href="/questions/{{idd}}/{{n+1}}/{{y+1}}/{{m+2}}">maybe</a>
     </div>
 {% endblock %}
 
