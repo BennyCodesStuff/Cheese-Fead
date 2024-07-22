@@ -13,6 +13,7 @@ def questions(id, no, yes, maybe):
     no -= 1
     yes -= 1
     maybe -= 1
+    sigma = (no + yes + maybe)
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
     cursor.execute("SELECT theQuestion FROM questions WHERE id = ?",(id,))# ? = id
@@ -55,6 +56,7 @@ if __name__ == "__main__":
 
 
 
+#stop this now
 
 
 
@@ -66,8 +68,7 @@ if __name__ == "__main__":
 
 
 
-
-
+#your evil if you go past this
 
 
 

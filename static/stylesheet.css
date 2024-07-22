@@ -44,3 +44,50 @@
   margin: 2%;
   background-color: #7f675B;
 }
+
+
+.topnav {
+  background-color: #7f675B;
+  overflow: hidden;
+}
+.topnav a {
+  float: left;
+  color: #f4e87c;
+  text-align: center;
+  font-size: 17px;
+  padding: 0.5%;
+}
+.topnav a:hover {
+  background-color: #acbdd8;
+}
+.topnav a.active {
+  background-color: #f4e87c;
+  color: white;
+}
+
+#grainer {
+  text-align: left;
+  font-size: 130%;
+  overflow: hidden;
+  float: left;
+  gap: 6%;
+  background-color: #7f675B;
+  padding: 1%;
+}
+
+.grids{
+  overflow: hidden;
+}
+
+.grids a {
+  float: left;
+  color: #f4e87c;
+  text-align: center;
+  font-size: 200%;
+  padding: 2%;
+  border-color: black;
+  border-style: solid;
+  border-width: 2%;
+  margin: 2%;
+  background-color: #7f675B;
+}
