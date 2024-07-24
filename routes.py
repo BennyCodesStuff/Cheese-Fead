@@ -1,11 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 
 
 import sqlite3
 
 
 app = Flask(__name__)
-
+app.secret_key = "sigmakey.py"
 
 @app.route('/')
 def home():
@@ -15,8 +15,8 @@ def home():
 @app.route("/questions/<int:id>/<int:no>/<int:yes>/<int:maybe>")
 def questions(id, no, yes, maybe):
     if id <= 9:
-        no -= 1
-        yes -= 1
+        no -= 100
+        yes -= 10
         maybe -= 1
         conn = sqlite3.connect("CheeseFeed.db")
         cursor = conn.cursor()
@@ -24,6 +24,7 @@ def questions(id, no, yes, maybe):
         questions = cursor.fetchone()
         conn.close()
         id += 1
+        session['fortnut'] = no + yes + maybe
     else:
         return render_template("theCHeeseKenews.html", n=no, y=yes, m=maybe)
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
@@ -31,8 +32,14 @@ def questions(id, no, yes, maybe):
 
 
 @app.route('/theCHeeseKenews')
-def theCHeeseKenews():
-    return render_template('theCHeeseKenews.html')
+def theCHeeseKenews(id):
+    id = session['fortnut']
+    conn = sqlite3.connect("CheeseFeed.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT CheesePersonalty FROM cheese WHERE id = ?", (id,))
+    cheese = cursor.fetchone()
+    conn.close()
+    return render_template('theCHeeseKenews.html', c=cheese)
 
 
 @app.route('/login')
