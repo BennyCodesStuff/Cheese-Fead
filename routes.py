@@ -15,8 +15,8 @@ def home():
 @app.route("/questions/<int:id>/<int:no>/<int:yes>/<int:maybe>")
 def questions(id, no, yes, maybe):
     if id <= 9:
-        no -= 100
-        yes -= 10
+        no -= 1
+        yes -= 1
         maybe -= 1
         conn = sqlite3.connect("CheeseFeed.db")
         cursor = conn.cursor()
@@ -30,7 +30,7 @@ def questions(id, no, yes, maybe):
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
                            m=maybe)
 
-
+ 
 @app.route('/theCHeeseKenews')
 def theCHeeseKenews(id):
     id = session['fortnut']

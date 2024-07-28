@@ -1,22 +1,4 @@
-
-.topnav {
-  background-color: #7f675B;
-  overflow: hidden;
-}
-.topnav a {
-  float: left;
-  color: #f4e87c;
-  text-align: center;
-  font-size: 17px;
-  padding: 0.5%;
-}
-.topnav a:hover {
-  background-color: #acbdd8;
-}
-.topnav a.active {
-  background-color: #f4e87c;
-  color: white;
-}
+/* this is the stley sheet for all or most of cheese fead. */
 
 #grainer {
   text-align: left;
@@ -70,10 +52,18 @@
   font-size: 130%;
   overflow: hidden;
   float: left;
-  gap: 6%;
   background-color: #7f675B;
   padding: 1%;
+  
+  .item1{
+    gap: 20px;
+    float: none;
+    display: grid;
+    grid-template-columns: 45% 55%;
+    text-overflow: clip;
+  }
 }
+
 
 .grids{
   overflow: hidden;
