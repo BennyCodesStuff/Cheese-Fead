@@ -24,22 +24,22 @@ def questions(id, no, yes, maybe):
         questions = cursor.fetchone()
         conn.close()
         id += 1
-        session['fortnut'] = no + yes + maybe
+        session['fortnut'] = no*100 + yes*10 + maybe
     else:
         return render_template("theCHeeseKenews.html", n=no, y=yes, m=maybe)
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
                            m=maybe)
 
  
-@app.route('/theCHeeseKenews')
+@app.route('/theCHeeseKenews/<int:id>')
 def theCHeeseKenews(id):
     id = session['fortnut']
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT CheesePersonalty FROM cheese WHERE id = ?", (id,))
+    cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
     cheese = cursor.fetchone()
     conn.close()
-    return render_template('theCHeeseKenews.html', c=cheese)
+    return render_template('theCHeeseKenews.html', a = id)
 
 
 @app.route('/login')
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
 
 # dont go down trust
-# stop this now
+# stop this now 
 #  your evil if you go past this
 # @app.route("/ansers/<int:idd>")
 # def answers(idd):
