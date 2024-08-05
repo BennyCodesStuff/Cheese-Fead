@@ -28,7 +28,7 @@ def questions(id, no, yes, maybe):
         vp = no*100 + yes*10 + maybe
         print(vp)
     else:
-        return render_template("/theCHeeseKenews/1", n=no, y=yes, m=maybe)
+        return render_template("theCHeeseKenews.html", n=no, y=yes, m=maybe)
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
                            m=maybe)
 
@@ -38,10 +38,10 @@ def theCHeeseKenews(id):
     id = session['fortnut']
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
+    cursor.execute("SELECT cheese , discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
     cheese = cursor.fetchone()
     conn.close()
-    return render_template('theCHeeseKenews.html', c = cheese )
+    return render_template('theCHeeseKenews.html', c = cheese)
 
 
 @app.route('/login')
