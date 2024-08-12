@@ -24,11 +24,12 @@ def questions(id, no, yes, maybe):
         questions = cursor.fetchone()
         conn.close()
         id += 1
-        session['fortnut'] = no*100 + yes*10 + maybe
-        vp = no*100 + yes*10 + maybe
-        print(vp)
     else:
-        return render_template("theCHeeseKenews.html", n=no, y=yes, m=maybe)
+        session['fortnut'] = no*100 + yes*10 + maybe
+        id = abs(id)
+        if session['fortnut'] > 653:
+            session['fortnut'] = 35 
+        return render_template("goToCHeeseKeNeWS.html", n=no, y=yes, m=maybe)
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
                            m=maybe)
 
