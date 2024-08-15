@@ -1,11 +1,12 @@
 from flask import Flask, render_template, session
-
-
 import sqlite3
-
+# from flask import request
+# from random import choice
+# from gc import collect
 
 app = Flask(__name__)
 app.secret_key = "sigmakey.py"
+
 
 @app.route('/')
 def home():
@@ -28,21 +29,24 @@ def questions(id, no, yes, maybe):
         session['fortnut'] = no*100 + yes*10 + maybe
         id = abs(id)
         if session['fortnut'] > 653:
-            session['fortnut'] = 35 
+            session['fortnut'] = 35
         return render_template("goToCHeeseKeNeWS.html", n=no, y=yes, m=maybe)
     return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
                            m=maybe)
 
- 
+
 @app.route('/theCHeeseKenews/<int:id>')
 def theCHeeseKenews(id):
     id = session['fortnut']
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT cheese , discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
-    cheese = cursor.fetchone()
+    cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
+    cheese = cursor.fetchone()[0]
+    cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
+    discription = cursor.fetchone()
+    filePATH = f'../static/cheese/{cheese}.jpg'
     conn.close()
-    return render_template('theCHeeseKenews.html', c = cheese)
+    return render_template('theCHeeseKenews.html', c=cheese, d=discription, p=filePATH)
 
 
 @app.route('/login')
@@ -55,7 +59,7 @@ if __name__ == "__main__":
 
 
 # dont go down trust
-# stop this now 
+# stop this now
 #  your evil if you go past this
 # @app.route("/ansers/<int:idd>")
 # def answers(idd):
