@@ -61,6 +61,8 @@ def questions(id, no, yes, maybe):
 @app.route("/theCHeeseKenews/<int:id>")
 def theCHeeseKenews(id):
     # Display the final result based on the quiz outcome
+    if "fortnut" not in session:
+        session["fortnut"] = 654
     id = session["fortnut"]
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
