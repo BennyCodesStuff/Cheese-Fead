@@ -33,6 +33,11 @@ def home():
     return render_template("cheeseFead.html")
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 @app.route("/questions/<int:id>/<int:no>/<int:yes>/<int:maybe>")
 def questions(id, no, yes, maybe):
     # Handle the questions flow in the quiz
@@ -157,19 +162,3 @@ def loginConfirm():
 if __name__ == "__main__":
     # Run the Flask application in debug mode
     app.run(debug=True)
-
-# dont touch me
-# old code i dont need anymore
-# @app.route("/ansers/<int:idd>")
-# def answers(idd):
-#   if idd == 10:
-#     conn = sqlite3.connect("CheeseFeed.db")
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT cheese
-# FROM CheesePersonalty WHERE id = ?",(id,10))# ? = id
-#     answers = cursor.fetchone()
-#     conn.close()
-#   else:
-#     answers = []
-#     answers.append("borken")
-#   return render_template("theCHeeseKenews.html", a=answers)
