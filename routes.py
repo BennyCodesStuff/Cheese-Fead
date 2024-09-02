@@ -29,6 +29,8 @@ def resetSession():
 
 @app.route("/")
 def home():
+    session["answered"] = 1
+    session["fortnut"] = 0
     # Render the homepage
     return render_template("cheeseFead.html")
 
@@ -38,33 +40,47 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 
-@app.route("/questions/<int:id>/<int:no>/<int:yes>/<int:maybe>")
-def questions(id, no, yes, maybe):
+@app.route("/questions")
+def questions():
     # Handle the questions flow in the quiz
-    if id <= 9:
+    if session['answered'] >= 0:
+    if session['answered'] <= 9:
         # Decrease the count of no, yes, maybe responses for each question
-        no -= 1
-        yes -= 1
-        maybe -= 1
         conn = sqlite3.connect("CheeseFeed.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (id,))
+        cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
         questions = cursor.fetchone()  # Get the current question
         conn.close()
-        id += 1  # Move to the next question
+        session['answered'] += 1  # Move to the next question
     else:
         # Calculate a score and redirect to the results page
-        session["fortnut"] = no*100 + yes*10 + maybe
-        id = abs(id)
+        session['fortnut'] = abs(session['fortnut'])
         if session["fortnut"] > 653:
             session["fortnut"] = 35
-        return render_template("goToCHeeseKeNeWS.html", n=no, y=yes, m=maybe)
-    return render_template("questions.html", q=questions, idd=id, n=no, y=yes,
-                           m=maybe)
+        return render_template("goToCHeeseKeNeWS.html")
+    return render_template("questions.html", q=questions)
 
 
-@app.route("/theCHeeseKenews/<int:id>")
-def theCHeeseKenews(id):
+@app.route("/yes")
+def yes():
+    session["fortnut"] -= 1
+    return redirect(url_for("questions"))
+
+
+@app.route("/no")
+def no():
+    session["fortnut"] += 8
+    return redirect(url_for("questions"))
+
+
+@app.route("/maybe")
+def maybe():
+    session["fortnut"] += 98
+    return redirect(url_for("questions"))
+
+
+@app.route("/theCHeeseKenews")
+def theCHeeseKenews():
     # Display the final result based on the quiz outcome
     if "fortnut" not in session:
         session["fortnut"] = 654
@@ -77,8 +93,7 @@ def theCHeeseKenews(id):
     discription = cursor.fetchone()  # Get the personality description
     filePATH = f"../static/cheese/{cheese}.jpg"  # Path to the cheese image
     conn.close()
-    return render_template("theCHeeseKenews.html", c=cheese, d=discription,
-                           p=filePATH)
+    return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 
 
 @app.route("/signUP")
