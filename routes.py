@@ -43,7 +43,6 @@ def page_not_found(e):
 @app.route("/questions")
 def questions():
     # Handle the questions flow in the quiz
-    if session['answered'] >= 0:
     if session['answered'] <= 9:
         # Decrease the count of no, yes, maybe responses for each question
         conn = sqlite3.connect("CheeseFeed.db")
@@ -51,7 +50,6 @@ def questions():
         cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
         questions = cursor.fetchone()  # Get the current question
         conn.close()
-        session['answered'] += 1  # Move to the next question
     else:
         # Calculate a score and redirect to the results page
         session['fortnut'] = abs(session['fortnut'])
@@ -64,18 +62,21 @@ def questions():
 @app.route("/yes")
 def yes():
     session["fortnut"] -= 1
+    session['answered'] += 1  # Move to the next question
     return redirect(url_for("questions"))
 
 
 @app.route("/no")
 def no():
     session["fortnut"] += 8
+    session['answered'] += 1  # Move to the next question
     return redirect(url_for("questions"))
 
 
 @app.route("/maybe")
 def maybe():
     session["fortnut"] += 98
+    session['answered'] += 1  # Move to the next question
     return redirect(url_for("questions"))
 
 
@@ -88,7 +89,7 @@ def theCHeeseKenews():
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
     cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
-    cheese = cursor.fetchone()[0]  # Get the cheese type
+    cheese = cursor.fetchone()  # Get the cheese type
     cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
     discription = cursor.fetchone()  # Get the personality description
     filePATH = f"../static/cheese/{cheese}.jpg"  # Path to the cheese image
@@ -96,82 +97,85 @@ def theCHeeseKenews():
     return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 
 
-@app.route("/signUP")
+@app.route('/signUP')
 def sign_up():
-    # Render the signup page
-    return render_template("SignUp.html")
+    # Check for if password or username failed, and pass that on to the html page
+    if 'passwordFailed' in session:
+        del session['passwordFailed']
+        return render_template('SignUp.html', title="Sign Up:", usernameFailed=False, passwordFailed=True)
+    if 'usernameFailed' in session:
+        del session['usernameFailed']
+        return render_template('SignUp.html', title="Sign Up:", usernameFailed=True, passwordFailed=False)
+    else:
+        return render_template('SignUp.html', title="Sign Up:", usernameFailed=False, passwordFailed=False)
 
 
-@app.route("/signupConfirm", methods=["POST"])
+@app.route('/signupConfirm', methods=['POST'])
 def signupConfirm():
-    if request.method == "POST":
-        # Handle the signup form submission
-        password1 = request.form.get("password1")
-        password2 = request.form.get("password2")
+    if request.method == 'POST':
+        password1 = request.form.get('password1')
+        password2 = request.form.get('password2')
+        # Check if passwords match
         if password1 == password2:
-            # If passwords match, proceed with user registration
-            username = request.form.get("username")
+            username = request.form.get('username')
             conn = sqlite3.connect(db)
-            cursor = conn.cursor()
-            # Check if the username is already taken
-            cursor.execute("SELECT User_Id FROM User WHERE Username = ?",
-                           (username,))
-            if len(cursor.fetchall()) == 0:
-                # If the username is available, hash the password with a salt
+            cur = conn.cursor()
+            # Ensure that no other users have the same name, if not, return sign up with username error
+            cur.execute('SELECT User_Id FROM User WHERE Username = ?', (username,))
+            if len(cur.fetchall()) == 0:
+                # Generate a salt, add it to password, hash, and then insert this user info into the user table
                 salt = generate_salt(6)
                 password1 += salt
                 hasher = sha256()
                 hasher.update(password1.encode())
                 hashed = hasher.hexdigest()
-                # Insert the new user into the database
-                cursor.execute
-                ("INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)",
-                 (username, hashed, salt,))
+                cur.execute('INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)', (username, hashed, salt,))
                 conn.commit()
-                # Clear sensitive information from memory
+                # Remove passwords immediately instead of letting them stay in memory
                 del password1
                 del password2
                 collect()
                 session.clear()
-                return redirect(url_for("login"))  # Redirect to the login page
-            session["usernameFailed"] = True  # Username already exists
-            return redirect(url_for("sign_up"))  # Redirect back to signup
-        session["passwordFailed"] = True  # Passwords did not match
-        return redirect(url_for("sign_up"))  # Redirect back to signup
+                return redirect(url_for('login'))
+            session['usernameFailed'] = True
+            return redirect(url_for('sign_up'))
+        session['passwordFailed'] = True
+        return redirect(url_for('sign_up'))
 
 
-@app.route("/login")
+@app.route('/login')
 def login():
-    # Render the login page
-    return render_template("login.html")
+    # Check for if password or username failed, and pass that on to the html page
+    if 'failed' in session:
+        return render_template('login.html', title="Log in to your account:", failed=True)
+    else:
+        return render_template('login.html', title="Log in to your account:", failed=False)
 
 
-@app.route("/loginConfirm", methods=["POST"])
+@app.route('/loginConfirm', methods=['POST'])
 def loginConfirm():
-    if request.method == "POST":
-        # Handle the login form submission
-        password = request.form.get("password")
-        username = request.form.get("username")
+    if request.method == 'POST':
+        password = request.form.get('password')
+        username = request.form.get('username')
         conn = sqlite3.connect(db)
-        cursor = conn.cursor()
-        cursor.execute
-        ("SELECT User_Id, Hash, Salt FROM User WHERE Username = ?", (username,)
-         )
-        data = cursor.fetchone()
+        cur = conn.cursor()
+        cur.execute('SELECT User_Id, Hash, Salt FROM User WHERE Username = ?', (username,))
+        data = cur.fetchone()
+        # Check if user exists, else return page with failed
         if data is not None:
-            # If the user exists, validate the password
+            # Hash password with salt added, and if successful, redirect to account page
             hasher = sha256()
-            password += data[2]  # Add the salt to the password before hashing
+            password += data[2]
             hasher.update(password.encode())
             hashed = hasher.hexdigest()
             if hashed == data[1]:
-                session["user_id"] = data[0]  # Store the user ID in session
-                del password  # Clear password from memory
+                session['user_id'] = data[0]
+                # Delete password to avoid it staying in memory
+                del password
                 collect()
-                return redirect("/theCHeeseKenews/0")
-            # Redirect to the result page
-        session["failed"] = True  # Login failed
-        return redirect(url_for("login"))  # Redirect back to login
+                return redirect('/theCHeeseKenews')
+        session['failed'] = True
+        return redirect(url_for('login'))
 
 
 if __name__ == "__main__":

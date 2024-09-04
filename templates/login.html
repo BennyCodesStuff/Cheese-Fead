@@ -7,11 +7,11 @@
 </head>
 <body>
     <h1>Log in to your account</h1>
-    
+
     {% if failed %}
         <p style="color: red;">Login failed. Please check your username and password.</p>
     {% endif %}
-    
+
     <form action="{{ url_for('loginConfirm') }}" method="POST">
         <h2>Login</h2>
         <label for="username">Username:</label>
@@ -23,3 +23,4 @@
         <button type="submit">Login</button>
     </form>
 {% endblock %}
+
