@@ -145,7 +145,7 @@ def signupConfirm():
 
 @app.route('/login')
 def login():
-    # Check for if password or username failed, and pass that on to the html page
+    # Check for if password or username failed, and pass that on to the html pages
     if 'failed' in session:
         return render_template('login.html', title="Log in to your account:", failed=True)
     else:
@@ -179,5 +179,4 @@ def loginConfirm():
 
 
 if __name__ == "__main__":
-    # Run the Flask application in debug mode
-    app.run(debug=True)
+    app.run()
