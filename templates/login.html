@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
+<body >
     <h1>Log in to your account</h1>
 
     {% if failed %}
         <p style="color: red;">Login failed. Please check your username and password.</p>
     {% endif %}
 
-    <form action="{{ url_for('loginConfirm') }}" method="POST">
+    <form action="{{ url_for('loginConfirm') }}" method="POST" id ="l0gin">
         <h2>Login</h2>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>

@@ -27,11 +27,28 @@ def resetSession():
     session["user_id"] = placeholder
 
 
+def set_fortnut_value():
+    if "user_id" in session:
+        # User is logged in, fetch 'cheese' from the User table
+        user_id = session["user_id"]
+        conn = sqlite3.connect(db)
+        cursor = conn.cursor()
+        cursor.execute("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
+        cheese_result = cursor.fetchone()
+        conn.close()
+        if cheese_result is not None:
+            session["fortnut"] = cheese_result[0]  # Set fortnut to the value of the cheese column
+        else:
+            session["fortnut"] = 0  # In case the cheese value doesn't exist
+    else:
+        # User is not logged in, set fortnut to 0
+        session["fortnut"] = 0
+
+
 @app.route("/")
 def home():
+    set_fortnut_value()  # Set the correct fortnut value based on whether the user is logged in
     session["answered"] = 1
-    session["fortnut"] = 0
-    # Render the homepage
     return render_template("cheeseFead.html")
 
 
@@ -42,9 +59,7 @@ def page_not_found(e):
 
 @app.route("/questions")
 def questions():
-    # Handle the questions flow in the quiz
-    if session['answered'] <= 9:
-        # Decrease the count of no, yes, maybe responses for each question
+    if session.get('answered', 1) <= 9:
         conn = sqlite3.connect("CheeseFeed.db")
         cursor = conn.cursor()
         cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
@@ -55,14 +70,15 @@ def questions():
         session['fortnut'] = abs(session['fortnut'])
         if session["fortnut"] > 653:
             session["fortnut"] = 35
-        return render_template("goToCHeeseKeNeWS.html")
+        return redirect(url_for('theCHeeseKenews'))
     return render_template("questions.html", q=questions)
 
 
 @app.route("/yes")
 def yes():
-    session["fortnut"] -= 1
+    session["fortnut"] += 1
     session['answered'] += 1  # Move to the next question
+    print(session["fortnut"])
     return redirect(url_for("questions"))
 
 
@@ -70,6 +86,7 @@ def yes():
 def no():
     session["fortnut"] += 8
     session['answered'] += 1  # Move to the next question
+    print(session["fortnut"])
     return redirect(url_for("questions"))
 
 
@@ -77,6 +94,7 @@ def no():
 def maybe():
     session["fortnut"] += 98
     session['answered'] += 1  # Move to the next question
+    print(session["fortnut"])
     return redirect(url_for("questions"))
 
 
@@ -88,11 +106,20 @@ def theCHeeseKenews():
     id = session["fortnut"]
     conn = sqlite3.connect("CheeseFeed.db")
     cursor = conn.cursor()
+    if "user_id" in session:
+        user_id = session["user_id"]
+        cursor.execute("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
+        cheese_result = cursor.fetchone()
+        if cheese_result is None:
+            cursor.execute("INSERT INTO User (User_id , cheese) VALUES (?, ?)", (user_id, id))
+        else:
+            cursor.execute("UPDATE User SET cheese = ? WHERE User_id = ?", (id, user_id))
+        conn.commit()
     cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
     cheese = cursor.fetchone()  # Get the cheese type
     cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
     discription = cursor.fetchone()  # Get the personality description
-    filePATH = f"../static/cheese/{cheese}.jpg"  # Path to the cheese image
+    filePATH = f"../static/cheese/{cheese}.jpg"
     conn.close()
     return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 
@@ -173,10 +200,11 @@ def loginConfirm():
                 # Delete password to avoid it staying in memory
                 del password
                 collect()
-                return redirect('/theCHeeseKenews')
+                return redirect('/')
         session['failed'] = True
         return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
+
     app.run()
