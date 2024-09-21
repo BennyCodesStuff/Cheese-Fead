@@ -59,6 +59,9 @@ def page_not_found(e):
 
 @app.route("/questions")
 def questions():
+    # Ensure fortnut is initialized
+    if "fortnut" not in session:
+        set_fortnut_value()
     if session.get('answered', 1) <= 9:
         conn = sqlite3.connect("CheeseFeed.db")
         cursor = conn.cursor()
@@ -76,25 +79,37 @@ def questions():
 
 @app.route("/yes")
 def yes():
+    # Ensure fortnut is initialized
+    if "fortnut" not in session:
+        set_fortnut_value()
+    elif session["fortnut"] is None:
+        session["fortnut"] = 0
     session["fortnut"] += 1
-    session['answered'] += 1  # Move to the next question
-    print(session["fortnut"])
+    session['answered'] += 1
     return redirect(url_for("questions"))
 
 
 @app.route("/no")
 def no():
+    # Ensure fortnut is initialized
+    if "fortnut" not in session:
+        set_fortnut_value()
+    elif session["fortnut"] is None:
+        session["fortnut"] = 0
     session["fortnut"] += 8
-    session['answered'] += 1  # Move to the next question
-    print(session["fortnut"])
+    session['answered'] += 1
     return redirect(url_for("questions"))
 
 
 @app.route("/maybe")
 def maybe():
+    # Ensure fortnut is initialized
+    if "fortnut" not in session:
+        set_fortnut_value()
+    elif session["fortnut"] is None:
+        session["fortnut"] = 0
     session["fortnut"] += 98
-    session['answered'] += 1  # Move to the next question
-    print(session["fortnut"])
+    session['answered'] += 1
     return redirect(url_for("questions"))
 
 
@@ -117,9 +132,13 @@ def theCHeeseKenews():
         conn.commit()
     cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
     cheese = cursor.fetchone()  # Get the cheese type
+    if cheese is None:
+        cheese = "you need to anwer the questions"
+    else:
+        cheese = cheese[0]
     cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
     discription = cursor.fetchone()  # Get the personality description
-    filePATH = f"../static/cheese/{cheese}.jpg"
+    filePATH = f"/static/cheese/{cheese}.jpg"
     conn.close()
     return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 
@@ -203,6 +222,12 @@ def loginConfirm():
                 return redirect('/')
         session['failed'] = True
         return redirect(url_for('login'))
+
+
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear session on logout
+    return render_template('logout.html')
 
 
 if __name__ == "__main__":

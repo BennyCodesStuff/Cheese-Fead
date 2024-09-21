@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <head>
     <title>your cheese human yes sir yes is here </title>
-    <link rel = "stylesheet" href = "/static\stylesheet.css">
+    <link rel = "stylesheet" href = "/static/stylesheet.css">
 
     <div class="topnav">
         <a class="active" href="/">Home</a>
-        <a href="/login">Login</a>
-        <a href="/signUP">Sign Up</a>
+        {% if not session.user_id %}
+            <a href="/login">Login</a>
+            <a href="/signUP">Sign Up</a>
+        {% endif %}
         <a href="/questions">Questions</a>
         <a href="/theCHeeseKenews">The Cheese Kenews</a>
-        </div>
+        {% if session.user_id %}
+            <a href="/logout">Logout</a>
+        {% endif %}
+    </div>
 </head>
 <body>
     {% block content %}{% endblock %}
 </body>
-
