@@ -18,21 +18,18 @@
             It's incredible how something so simple can have such profound effects on one's life. Embracing my Brie nature has allowed me to find peace and contentment in everyday moments.
             In conclusion, my cheese personality has not only brought personal growth and happiness but also serves as a reminder of resilience and adaptability. 
             Even in the most challenging times, finding small comforts like cheese can make a world of difference.</p> </div>
-            <div class ="item2"> <img src="static\cheese\Abbaye de Citeaux.jpg"> </div>
+        <div class ="item2"> 
+            <div id="cheeseFead-grid">
+                <!-- Display the random image -->
+                {% if image_path %}
+                    <img id="dynamicImage" src="{{ image_path }}" width="100%" height="100%">
+                {% else %}
+                    <p>No images available</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <div id="cheeseFead-grid">
-        <div class="item1">
-            <!-- Display the random image -->
-            {% if image_path %}
-                <img id="dynamicImage" src="{{ image_path }}" alt="Dynamic Image">
-            {% else %}
-                <p>No images available</p>
-            {% endif %}
-        </div>
-        <div class="item2">
-            Item 2 content
-        </div>
-    </div>
+   
 </body>
 {% endblock %}

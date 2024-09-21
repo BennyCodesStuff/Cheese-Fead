@@ -49,7 +49,7 @@ def set_fortnut_value():
 # Function to return a random image from the static/images folder
 def get_random_image():
     image_folder = os.path.join(app.root_path, 'static', 'cheeseImages')
-    image_files = [f for f in image_folder if f.endswith(('.jpg'))]
+    image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
     if image_files:
         return choice(image_files)
     else:
@@ -63,7 +63,7 @@ def home():
     # Get a random image to display
     rand_image = get_random_image()
     if rand_image:
-        image_path = f'/static/cheeseImages{rand_image}'
+        image_path = f'/static/cheeseImages/{rand_image}'  # Fix the path with correct slash
     else:
         image_path = None  # Handle the case where there are no images
     return render_template("cheeseFead.html", image_path=image_path)
@@ -71,7 +71,7 @@ def home():
 # Route to serve images
 @app.route('/static/images/<filename>')
 def serve_image(filename):
-    return send_from_directory(cheeseImages, filename)
+    return send_from_directory(filename)
 
 
 @app.errorhandler(404)
