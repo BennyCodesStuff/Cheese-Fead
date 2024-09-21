@@ -1,8 +1,9 @@
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for, send_from_directory
 import sqlite3
 from hashlib import sha256
 from random import choice
 from gc import collect
+import os
 
 app = Flask(__name__)
 app.secret_key = "sigmakey.py"  # Secret key used for session management
@@ -45,11 +46,32 @@ def set_fortnut_value():
         session["fortnut"] = 0
 
 
+# Function to return a random image from the static/images folder
+def get_random_image():
+    image_folder = os.path.join(app.root_path, 'static', 'cheeseImages')
+    image_files = [f for f in image_folder if f.endswith(('.jpg'))]
+    if image_files:
+        return choice(image_files)
+    else:
+        return None
+
+
 @app.route("/")
 def home():
     set_fortnut_value()  # Set the correct fortnut value based on whether the user is logged in
     session["answered"] = 1
-    return render_template("cheeseFead.html")
+    # Get a random image to display
+    rand_image = get_random_image()
+    if rand_image:
+        image_path = f'/static/cheeseImages{rand_image}'
+    else:
+        image_path = None  # Handle the case where there are no images
+    return render_template("cheeseFead.html", image_path=image_path)
+
+# Route to serve images
+@app.route('/static/images/<filename>')
+def serve_image(filename):
+    return send_from_directory(cheeseImages, filename)
 
 
 @app.errorhandler(404)
@@ -138,7 +160,7 @@ def theCHeeseKenews():
         cheese = cheese[0]
     cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
     discription = cursor.fetchone()  # Get the personality description
-    filePATH = f"/static/cheese/{cheese}.jpg"
+    filePATH = f"/static/cheeseImages/{cheese}.jpg"
     conn.close()
     return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 

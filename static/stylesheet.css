@@ -1,14 +1,6 @@
 /* this is the stley sheet for all or most of cheese fead. */
 
-#grainer {
-  text-align: left;
-  font-size: 130%;
-  overflow: hidden;
-  float: left;
-  gap: 6%;
-  background-color: #7f675B;
-  padding: 1%;
-}
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 .grids{
   overflow: hidden;
@@ -29,58 +21,48 @@
 
 
 .topnav {
+  font-family: "Lato";
   background-color: #7f675B;
   overflow: hidden;
 }
+
 .topnav a {
   float: left;
   color: #f4e87c;
   text-align: center;
-  font-size: 17px;
+  font-size: 30px;
   padding: 0.5%;
 }
+
 .topnav a:hover {
-  background-color: #acbdd8;
-}
-.topnav a.active {
-  background-color: #f4e87c;
-  color: white;
+  background-color: #beb889;
 }
 
-#grainer {
+
+#cheeseFead-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 6%;
+  background-color: #7f675B;
+  padding: 1%;
   text-align: left;
   font-size: 130%;
   overflow: hidden;
-  float: left;
+}
+
+.item1{
+  gap: 20px;
+  float: none;
+  display: grid;
+  text-overflow: clip;
   background-color: #7f675B;
-  padding: 1%;
-  
-  .item1{
-    gap: 20px;
-    float: none;
-    display: grid;
-    grid-template-columns: 45% 55%;
-    text-overflow: clip;
-  }
+  grid-column: 1; /* Place item1 in the first column */
 }
-
-
-.grids{
-  overflow: hidden;
-}
-
-.grids a {
-  float: left;
-  color: #f4e87c;
-  text-align: center;
-  font-size: 200%;
-  padding: 2%;
-  border-color: black;
-  border-style: solid;
-  border-width: 2%;
-  margin: 2%;
+.item2{
   background-color: #7f675B;
+  grid-column: 2; /* Place item2 in the second column */
 }
+
 
 .l0gin{
   background-color: #ecde64;
