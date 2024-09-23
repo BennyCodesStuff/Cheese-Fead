@@ -196,7 +196,12 @@ def questions():
     else:
         # Calculate a score and redirect to the results page
         session['cheeseNUM'] = abs(session['cheeseNUM'])
-        if session["cheeseNUM"] > 653:
+        conn = sqlite3.connect("CheeseFeed.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM CheesePersonalty")
+        cheese_length = len(cursor.fetchall())  # Get the current question
+        conn.close()
+        if session["cheeseNUM"] > cheese_length:
             session["cheeseNUM"] = 35
         return redirect(url_for('theCHeeseKenews'))  # Redirect to results page
     return render_template("questions.html", q=questions)

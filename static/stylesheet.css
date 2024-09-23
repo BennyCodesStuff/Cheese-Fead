@@ -5,6 +5,7 @@
 .grids{
   overflow: hidden;
 }
+
 h1{
   font-family: "Lato";
 }
@@ -12,6 +13,7 @@ h1{
 p{
   font-family: sans-serif;
 }
+
 .grids a {
   float: left;
   color: #f4e87c;
@@ -71,5 +73,10 @@ p{
 
 
 .l0gin{
+  background-color: #ecde64;
+}
+
+#fourOfour{
+  text-align: center;
   background-color: #ecde64;
 }
