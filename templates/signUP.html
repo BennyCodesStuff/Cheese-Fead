@@ -10,13 +10,13 @@
     
     <form action="{{ url_for('signupConfirm') }}" method="POST">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+        <input type="text" id="username" name="username" required maxlength="15">
         <br>
         <label for="password1">Password:</label>
-        <input type="password" id="password1" name="password1" required>
+        <input type="password" id="password1" name="password1" required maxlength="15">
         <br>
         <label for="password2">Confirm Password:</label>
-        <input type="password" id="password2" name="password2" required>
+        <input type="password" id="password2" name="password2" required maxlength="15">
         <br>
         {% if usernameFailed %}
             <p style="color: red;">Username already exists.</p>
