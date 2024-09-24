@@ -89,7 +89,7 @@ def home():
         # Fix the path with correct slash
     else:
         image_path = None  # Handle the case where there are no images
-    return render_template("cheeseFead.html", image_path=image_path)
+    return render_template("cheesefeed.html", image_path=image_path)
     # Render home page with the random image
 
 
@@ -182,22 +182,20 @@ def loginConfirm():
 
 @app.route("/questions")
 def questions():
+    conn = sqlite3.connect("CheeseFeed.db")
+    cursor = conn.cursor()
     # Ensure cheeseNUM is initialized
     if "cheeseNUM" not in session:
         set_cheeseNUM_value()
     if session.get('answered', 1) <= 9:
         # Retrieve the next question if
         # less than 9 have allready done the questions
-        conn = sqlite3.connect("CheeseFeed.db")
-        cursor = conn.cursor()
         cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
         questions = cursor.fetchone()  # Get the current question
         conn.close()
     else:
         # Calculate a score and redirect to the results page
         session['cheeseNUM'] = abs(session['cheeseNUM'])
-        conn = sqlite3.connect("CheeseFeed.db")
-        cursor = conn.cursor()
         cursor.execute("SELECT id FROM CheesePersonalty")
         cheese_length = len(cursor.fetchall())  # Get the current question
         conn.close()
