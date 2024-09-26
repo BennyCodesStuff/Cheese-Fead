@@ -64,7 +64,8 @@ def set_cheeseNUM_value():
     if "user_id" in session:
         # User is logged in, fetch 'cheese' from the User table
         user_id = session["user_id"]
-        cheese_result = quick_queryONE("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
+        cheese_result = quick_queryONE(
+            "SELECT cheese FROM User WHERE User_id = ?", (user_id,))
         if cheese_result is not None:
             session["cheeseNUM"] = cheese_result[0]
             # Set cheeseNUM to value in database
@@ -121,12 +122,15 @@ def sign_up():
     # Sign up page with error handling for failed username or password
     if 'passwordFailed' in session:
         del session['passwordFailed']
-        return render_template('SignUp.html', title="Sign Up:", usernameFailed=False, passwordFailed=True)
+        return render_template('SignUp.html', title="Sign Up:",
+                               usernameFailed=False, passwordFailed=True)
     if 'usernameFailed' in session:
         del session['usernameFailed']
-        return render_template('SignUp.html', title="Sign Up:", usernameFailed=True, passwordFailed=False)
+        return render_template('SignUp.html', title="Sign Up:",
+                               usernameFailed=True, passwordFailed=False)
     else:
-        return render_template('SignUp.html', title="Sign Up:", usernameFailed=False, passwordFailed=False)
+        return render_template('SignUp.html', title="Sign Up:",
+                               usernameFailed=False, passwordFailed=False)
 
 
 @app.route('/signupConfirm', methods=['POST'])
@@ -140,7 +144,9 @@ def signupConfirm():
             username = request.form.get('username')
             # Ensure that no other users have the same name, if not,
             # return sign up with username error
-            if len(quick_queryALL('SELECT User_Id FROM User WHERE Username = ?', (username,))) == 0:
+            if len(quick_queryALL
+                    ('SELECT User_Id FROM User WHERE Username = ?',
+                        (username,))) == 0:
                 # Salt and hash the password,
                 # then store the user info in the database
                 salt = generate_salt(6)
@@ -148,7 +154,9 @@ def signupConfirm():
                 hasher = sha256()
                 hasher.update(password1.encode())
                 hashed = hasher.hexdigest()
-                quick_queryCOMMIT('INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)', (username, hashed, salt,))
+                quick_queryCOMMIT(
+                    'INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)',
+                    (username, hashed, salt,))
                 # Clear sensitive information from memory(paswords)
                 del password1
                 del password2
@@ -166,9 +174,11 @@ def login():
     # Check for if password or username failed,
     # and pass that on to the html pages
     if 'failed' in session:
-        return render_template('login.html', title="Log in to your account:", failed=True)
+        return render_template('login.html', title="Log in to your account:",
+                               failed=True)
     else:
-        return render_template('login.html', title="Log in to your account:", failed=False)
+        return render_template('login.html', title="Log in to your account:",
+                               failed=False)
 
 
 @app.route('/loginConfirm', methods=['POST'])
@@ -176,7 +186,9 @@ def loginConfirm():
     if request.method == 'POST':
         password = request.form.get('password')
         username = request.form.get('username')
-        data = quick_queryONE('SELECT User_Id, Hash, Salt FROM User WHERE Username = ?', (username,))
+        data = quick_queryONE(
+            'SELECT User_Id, Hash, Salt FROM User WHERE Username = ?',
+            (username,))
         # Check if user exists, else return page with failed
         if data is not None:
             # Hash password with salt added,
@@ -201,18 +213,18 @@ def questions():
     # Ensure cheeseNUM is initialized
     if "cheeseNUM" not in session:
         set_cheeseNUM_value()
-        # Check if the user has already answered the questions
-    # if session.get('cheeseNUM', 0) > 0:
-    #     return redirect(url_for('theCHeeseKenews'))  # Redirect to results if they already answered
     if session.get('answered', 1) <= 9:
         # Retrieve the next question if
         # less than 9 have allready done the questions
-        questions = quick_queryONE("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
+        questions = quick_queryONE(
+            "SELECT theQuestion FROM questions WHERE id = ?",
+            (session['answered'],))
         # Get the current question
     else:
         # Calculate a score and redirect to the results page
         session['cheeseNUM'] = abs(session['cheeseNUM'])
-        cheese_length = len(quick_queryALL("SELECT id FROM CheesePersonalty", ()))
+        cheese_length = len(quick_queryALL(
+            "SELECT id FROM CheesePersonalty", ()))
         # Get the current question
         if session["cheeseNUM"] > cheese_length:
             session["cheeseNUM"] = 35
@@ -265,19 +277,26 @@ def theCHeeseKenews():
     # Update the user's 'cheese' value in the User table
     if "user_id" in session:
         user_id = session["user_id"]
-        cheese_result = quick_queryONE("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
+        cheese_result = quick_queryONE(
+            "SELECT cheese FROM User WHERE User_id = ?", (user_id,))
         if cheese_result is None:
-            quick_queryCOMMIT("INSERT INTO User (User_id , cheese) VALUES (?, ?)", (user_id, id))
+            quick_queryCOMMIT(
+                "INSERT INTO User (User_id , cheese) VALUES (?, ?)",
+                (user_id, id))
         else:
-            quick_queryCOMMIT("UPDATE User SET cheese = ? WHERE User_id = ?", (id, user_id))
+            quick_queryCOMMIT("UPDATE User SET cheese = ? WHERE User_id = ?",
+                              (id, user_id))
     # Fetch cheese type and description based on quiz outcome
-    cheese = quick_queryONE("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
+    cheese = quick_queryONE(
+        "SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
     # Get the cheese type
     if cheese is None:
         cheese = "you need to anwer the questions"
     else:
         cheese = cheese[0]
-    discription = quick_queryONE("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
+    discription = quick_queryONE(
+        "SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?",
+        (id,))
     # Get the personality description
     if discription is None:
         discription = "the questions are still not anserd"
@@ -285,7 +304,8 @@ def theCHeeseKenews():
         discription = discription[0]
     filePATH = f"/static/cheeseImages/{cheese}.jpg"
     # Image path for the cheese
-    return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
+    return render_template("theCHeeseKenews.html", c=cheese, d=discription,
+                           p=filePATH)
 
 
 @app.route('/logout')
