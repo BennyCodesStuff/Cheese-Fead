@@ -15,6 +15,33 @@ app.secret_key = "sigmakey.py"
 db = "CheeseFeed.db"
 
 
+def quick_queryALL(query, values):
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    cursor.execute(query, values)
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+
+def quick_queryONE(query, values):
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    cursor.execute(query, values)
+    result = cursor.fetchone()
+    conn.close()
+    return result
+
+
+def quick_queryCOMMIT(query, values):
+    conn = sqlite3.connect(db)
+    cursor = conn.cursor()
+    cursor.execute(query, values)
+    conn.commit()
+    conn.close()
+    return
+
+
 def generate_salt(length):
     # Generate a random string of characters to be used as a salt for hashing
     # passwords
@@ -37,11 +64,7 @@ def set_cheeseNUM_value():
     if "user_id" in session:
         # User is logged in, fetch 'cheese' from the User table
         user_id = session["user_id"]
-        conn = sqlite3.connect(db)
-        cursor = conn.cursor()
-        cursor.execute("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
-        cheese_result = cursor.fetchone()
-        conn.close()
+        cheese_result = quick_queryONE("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
         if cheese_result is not None:
             session["cheeseNUM"] = cheese_result[0]
             # Set cheeseNUM to value in database
@@ -115,12 +138,9 @@ def signupConfirm():
         # Check if passwords match
         if password1 == password2:
             username = request.form.get('username')
-            conn = sqlite3.connect(db)
-            cur = conn.cursor()
             # Ensure that no other users have the same name, if not,
             # return sign up with username error
-            cur.execute('SELECT User_Id FROM User WHERE Username = ?', (username,))
-            if len(cur.fetchall()) == 0:
+            if len(quick_queryALL(('SELECT User_Id FROM User WHERE Username = ?', (username,)))) == 0:
                 # Salt and hash the password,
                 # then store the user info in the database
                 salt = generate_salt(6)
@@ -128,8 +148,7 @@ def signupConfirm():
                 hasher = sha256()
                 hasher.update(password1.encode())
                 hashed = hasher.hexdigest()
-                cur.execute('INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)', (username, hashed, salt,))
-                conn.commit()
+                quick_queryCOMMIT('INSERT INTO User (Username, Hash, Salt) VALUES (?, ?, ?)', (username, hashed, salt,))
                 # Clear sensitive information from memory(paswords)
                 del password1
                 del password2
@@ -157,10 +176,7 @@ def loginConfirm():
     if request.method == 'POST':
         password = request.form.get('password')
         username = request.form.get('username')
-        conn = sqlite3.connect(db)
-        cur = conn.cursor()
-        cur.execute('SELECT User_Id, Hash, Salt FROM User WHERE Username = ?', (username,))
-        data = cur.fetchone()
+        data = quick_queryONE('SELECT User_Id, Hash, Salt FROM User WHERE Username = ?', (username,))
         # Check if user exists, else return page with failed
         if data is not None:
             # Hash password with salt added,
@@ -182,23 +198,22 @@ def loginConfirm():
 
 @app.route("/questions")
 def questions():
-    conn = sqlite3.connect("CheeseFeed.db")
-    cursor = conn.cursor()
     # Ensure cheeseNUM is initialized
     if "cheeseNUM" not in session:
         set_cheeseNUM_value()
+        # Check if the user has already answered the questions
+    # if session.get('cheeseNUM', 0) > 0:
+    #     return redirect(url_for('theCHeeseKenews'))  # Redirect to results if they already answered
     if session.get('answered', 1) <= 9:
         # Retrieve the next question if
         # less than 9 have allready done the questions
-        cursor.execute("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
-        questions = cursor.fetchone()  # Get the current question
-        conn.close()
+        questions = quick_queryONE("SELECT theQuestion FROM questions WHERE id = ?", (session['answered'],))
+        # Get the current question
     else:
         # Calculate a score and redirect to the results page
         session['cheeseNUM'] = abs(session['cheeseNUM'])
-        cursor.execute("SELECT id FROM CheesePersonalty")
-        cheese_length = len(cursor.fetchall())  # Get the current question
-        conn.close()
+        cheese_length = len(quick_queryALL("SELECT id FROM CheesePersonalty"))
+        # Get the current question
         if session["cheeseNUM"] > cheese_length:
             session["cheeseNUM"] = 35
         return redirect(url_for('theCHeeseKenews'))  # Redirect to results page
@@ -247,34 +262,29 @@ def theCHeeseKenews():
     if "cheeseNUM" not in session:
         return render_template('404.html')
     id = session["cheeseNUM"]
-    conn = sqlite3.connect("CheeseFeed.db")
-    cursor = conn.cursor()
     # Update the user's 'cheese' value in the User table
     if "user_id" in session:
         user_id = session["user_id"]
-        cursor.execute("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
-        cheese_result = cursor.fetchone()
+        cheese_result = quick_queryONE("SELECT cheese FROM User WHERE User_id = ?", (user_id,))
         if cheese_result is None:
-            cursor.execute("INSERT INTO User (User_id , cheese) VALUES (?, ?)", (user_id, id))
+            quick_queryCOMMIT("INSERT INTO User (User_id , cheese) VALUES (?, ?)", (user_id, id))
         else:
-            cursor.execute("UPDATE User SET cheese = ? WHERE User_id = ?", (id, user_id))
-        conn.commit()
+            quick_queryCOMMIT("UPDATE User SET cheese = ? WHERE User_id = ?", (id, user_id))
     # Fetch cheese type and description based on quiz outcome
-    cursor.execute("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
-    cheese = cursor.fetchone()  # Get the cheese type
+    cheese = quick_queryONE("SELECT cheese FROM CheesePersonalty WHERE id = ?", (id,))
+    # Get the cheese type
     if cheese is None:
         cheese = "you need to anwer the questions"
     else:
         cheese = cheese[0]
-    cursor.execute("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
-    discription = cursor.fetchone()  # Get the personality description
+    discription = quick_queryONE("SELECT discriptionOfPersoality FROM CheesePersonalty WHERE id = ?", (id,))
+    # Get the personality description
     if discription is None:
         discription = "the questions are still not anserd"
     else:
         discription = discription[0]
     filePATH = f"/static/cheeseImages/{cheese}.jpg"
     # Image path for the cheese
-    conn.close()
     return render_template("theCHeeseKenews.html", c=cheese, d=discription, p=filePATH)
 
 
@@ -287,5 +297,4 @@ def logout():
 
 
 if __name__ == "__main__":
-
     app.run()
