@@ -105,7 +105,6 @@ def home():
     # Home route sets cheeseNUM and loads a random image
     set_cheeseNUM_value()
     # Set the cheeseNUM based on user status (logged in or not)
-    session["answered"] = 1  # Initialize the question-answering session
     # Get a random image to display
     rand_image = get_random_image()
     if rand_image:
@@ -210,9 +209,23 @@ def loginConfirm():
 
 @app.route("/questions")
 def questions():
+    if "quizNUM" not in session:
+        session["quizNUM"] = 1  # Initialize the question-answering session
+    if "answered" not in session:
+        session["answered"] = 1  # Initialize the question-answering session
     # Ensure cheeseNUM is initialized
     if "cheeseNUM" not in session:
         set_cheeseNUM_value()
+        # see if user has done the questions and has a cheeseNUM
+    # Set cheeseNUM to 0 if it's None to stop errors
+    cheeseNUM = session.get("cheeseNUM", 0)
+    if cheeseNUM is None:
+        cheeseNUM = 0
+        session["cheeseNUM"] = cheeseNUM
+    # Check if user is logged in and already has a valid cheeseNUM
+    if "user_id" in session and cheeseNUM > 0:
+        # Redirect to the cheese results page if they already have a cheese
+        return redirect(url_for('theCHeeseKenews'))
     if session.get('answered', 1) <= 9:
         # Retrieve the next question if
         # less than 9 have allready done the questions
@@ -226,6 +239,8 @@ def questions():
         cheese_length = len(quick_queryALL(
             "SELECT id FROM CheesePersonalty", ()))
         # Get the current question
+        if session['cheeseNUM'] == 0:
+            session["cheeseNUM"] = session["quizNUM"]
         if session["cheeseNUM"] > cheese_length:
             session["cheeseNUM"] = 35
         return redirect(url_for('theCHeeseKenews'))  # Redirect to results page
@@ -239,7 +254,7 @@ def yes():
         set_cheeseNUM_value()  # Make sure cheeseNUM is initialized
     elif session["cheeseNUM"] is None:
         session["cheeseNUM"] = 0  # 0 if user did not input yes
-    session["cheeseNUM"] += 1  # Move to the next question
+    session["quizNUM"] += 1  # Move to the next question
     session['answered'] += 1
     return redirect(url_for("questions"))  # Redirect back to the next question
 
@@ -251,7 +266,7 @@ def no():
         set_cheeseNUM_value()
     elif session["cheeseNUM"] is None:
         session["cheeseNUM"] = 0
-    session["cheeseNUM"] += 8  # add 8 to cheeseNUM
+    session["quizNUM"] += 8  # add 8 to cheeseNUM
     session['answered'] += 1  # Move to the next question
     return redirect(url_for("questions"))
 
@@ -263,7 +278,7 @@ def maybe():
         set_cheeseNUM_value()
     elif session["cheeseNUM"] is None:
         session["cheeseNUM"] = 0
-    session["cheeseNUM"] += 98
+    session["quizNUM"] += 98
     session['answered'] += 1
     return redirect(url_for("questions"))
 
