@@ -1,13 +1,11 @@
 {% extends 'layout.html' %}
 {% block content %}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1> Sign Up</h1>
-    
+    <!-- this is the form for the sign up page -->
     <form action="{{ url_for('signupConfirm') }}" method="POST">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required maxlength="15">
@@ -18,9 +16,11 @@
         <label for="password2">Confirm Password:</label>
         <input type="password" id="password2" name="password2" required maxlength="15">
         <br>
-        {% if usernameFailed %}
+        {% if usernameFailed %}  
+        <!-- if the user allready exist it will retun this error -->
             <p style="color: red;">Username already exists.</p>
         {% endif %}
+        <!-- if the passwords do not match it will return this error -->
         {% if passwordFailed %}
             <p style="color: red;">Passwords do not match.</p>
         {% endif %}

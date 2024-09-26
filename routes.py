@@ -140,7 +140,7 @@ def signupConfirm():
             username = request.form.get('username')
             # Ensure that no other users have the same name, if not,
             # return sign up with username error
-            if len(quick_queryALL(('SELECT User_Id FROM User WHERE Username = ?', (username,)))) == 0:
+            if len(quick_queryALL('SELECT User_Id FROM User WHERE Username = ?', (username,))) == 0:
                 # Salt and hash the password,
                 # then store the user info in the database
                 salt = generate_salt(6)
@@ -212,7 +212,7 @@ def questions():
     else:
         # Calculate a score and redirect to the results page
         session['cheeseNUM'] = abs(session['cheeseNUM'])
-        cheese_length = len(quick_queryALL("SELECT id FROM CheesePersonalty"))
+        cheese_length = len(quick_queryALL("SELECT id FROM CheesePersonalty", ()))
         # Get the current question
         if session["cheeseNUM"] > cheese_length:
             session["cheeseNUM"] = 35

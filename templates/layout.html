@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <head>
-    <title>your cheese human yes sir yes is here </title>
+    <title>CheeseFeed </title>
     <link rel = "stylesheet" href = "/static/stylesheet.css">
-
+    <!-- this is the layout page it is used for the nav bar and conetcton to the style sheet -->
     <div class="topnav">
         <a class="active" href="/">Home</a>
         {% if not session.user_id %}
@@ -14,6 +14,9 @@
         {% if session.user_id %}
             <a href="/logout">Logout</a>
         {% endif %}
+        <!-- this is the nav bar the reason it has if session user id 
+         i beacuse the user might be logged in if they are loged in then they will not see sign up and loggin and wount see logout 
+         and the invers is for if you are logged in -->
     </div>
 </head>
 <body>

@@ -1,19 +1,18 @@
 {% extends 'layout.html' %}
 {% block content %}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body >
     <h1>Log in to your account</h1>
-
+<!-- this is incase there are any errors -->
     {% if failed %}
         <p style="color: red;">Login failed. Please check your username and password.</p>
     {% endif %}
 
     <form action="{{ url_for('loginConfirm') }}" method="POST" id ="l0gin">
         <h2>Login</h2>
+        <!-- this is the login form it conects to routes and then to the database to get login data so this form my work-->
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required  maxlength="15" >
         <br>
